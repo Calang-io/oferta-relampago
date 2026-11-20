@@ -5,6 +5,8 @@ import {
   TrendingDown,
   TrendingUp,
   Minus,
+  Sparkles,
+  Flame,
   ArrowUpDown,
   LayoutGrid,
   Table as TableIcon,
@@ -13,23 +15,23 @@ import {
 import type { RiskItem } from '../../../types/risk'
 import { Badge } from '../../../components/ui/Badge'
 import { formatCurrencyBRL } from '../../../utils/calculations'
-// import { useStore } from '../../../context/StoreContext'
-// import { useNavigate } from 'react-router-dom'
+import { useStore } from '../../../context/StoreContext'
+import { useNavigate } from 'react-router-dom'
 
 interface RiskTableProps {
   items: RiskItem[]
 }
 
 export const RiskTable: React.FC<RiskTableProps> = ({ items }) => {
-  // const { simulateIncomingOrder } = useStore()
-  // const navigate = useNavigate()
+  const { simulateIncomingOrder } = useStore()
+  const navigate = useNavigate()
 
   // Preferência de visualização (em mobile força 'cards', em desktop permite alternar)
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('table')
 
   if (items.length === 0) {
     return (
-      <div className="py-12 px-4 text-center rounded-xl border border-purple-900/60 bg-[#140a28]/90">
+      <div className="py-12 px-4 text-center rounded-xl border border-purple-900/60 bg-surface-table/90">
         <Package className="w-10 h-10 text-purple-400/50 mx-auto mb-3" />
         <h3 className="text-base font-bold text-white mb-1">Nenhum item encontrado</h3>
         <p className="text-xs text-purple-300/70">
@@ -41,15 +43,15 @@ export const RiskTable: React.FC<RiskTableProps> = ({ items }) => {
 
   return (
     <div className="space-y-3">
-      {/* Seletor de Modo de Exibição (apenas em telas maiores que mobile) */}
+      {/* Seletor de Modo de Exibição */}
       <div className="hidden sm:flex items-center justify-end gap-1 text-xs">
         <span className="text-purple-300/60 mr-1 text-[11px]">Visualização:</span>
         <button
           onClick={() => setViewMode('table')}
           className={`flex items-center gap-1 px-2.5 py-1 rounded-md transition-all ${
             viewMode === 'table'
-              ? 'bg-amber-400 text-purple-950 font-bold shadow-sm'
-              : 'bg-purple-950/60 text-purple-300 hover:text-amber-300 border border-purple-800/40'
+              ? 'bg-brand-amber text-purple-950 font-bold shadow-sm'
+              : 'bg-purple-950/60 text-purple-300 hover:text-brand-light border border-purple-800/40'
           }`}
         >
           <TableIcon className="w-3.5 h-3.5" />
@@ -59,8 +61,8 @@ export const RiskTable: React.FC<RiskTableProps> = ({ items }) => {
           onClick={() => setViewMode('cards')}
           className={`flex items-center gap-1 px-2.5 py-1 rounded-md transition-all ${
             viewMode === 'cards'
-              ? 'bg-amber-400 text-purple-950 font-bold shadow-sm'
-              : 'bg-purple-950/60 text-purple-300 hover:text-amber-300 border border-purple-800/40'
+              ? 'bg-brand-amber text-purple-950 font-bold shadow-sm'
+              : 'bg-purple-950/60 text-purple-300 hover:text-brand-light border border-purple-800/40'
           }`}
         >
           <LayoutGrid className="w-3.5 h-3.5" />
@@ -86,10 +88,10 @@ export const RiskTable: React.FC<RiskTableProps> = ({ items }) => {
               key={item.id}
               className={`rounded-xl p-3.5 sm:p-4 border transition-all relative overflow-hidden flex flex-col justify-between gap-3 ${
                 isCritical
-                  ? 'bg-gradient-to-br from-[#1d0d38] via-[#170a2c] to-[#120722] border-amber-400/50 shadow-[0_4px_20px_rgba(251,191,36,0.12)] border-l-4 border-l-amber-400'
+                  ? 'bg-gradient-to-br from-surface-critical via-surface-critical-mid to-surface-critical-end border-brand-amber/50 shadow-[0_4px_20px_rgba(251,191,36,0.12)] border-l-4 border-l-brand-amber'
                   : isModerate
-                  ? 'bg-gradient-to-br from-[#190d33] via-[#140826] to-[#10061e] border-purple-700/60 border-l-4 border-l-purple-500'
-                  : 'bg-[#140826]/90 border-purple-900/50 border-l-4 border-l-emerald-500/50'
+                  ? 'bg-gradient-to-br from-surface-moderate via-surface-moderate-mid to-surface-moderate-end border-purple-700/60 border-l-4 border-l-purple-500'
+                  : 'bg-surface-table/90 border-purple-900/50 border-l-4 border-l-risk-safe/50'
               }`}
             >
               {/* Header do Card */}
@@ -102,12 +104,12 @@ export const RiskTable: React.FC<RiskTableProps> = ({ items }) => {
                       </h4>
                       {item.trend === 'up' && (
                         <span title="Ritmo de saída acelerado">
-                          <TrendingUp className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                          <TrendingUp className="w-3.5 h-3.5 text-risk-safe shrink-0" />
                         </span>
                       )}
                       {item.trend === 'down' && (
                         <span title="Ritmo de saída abaixo da média">
-                          <TrendingDown className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                          <TrendingDown className="w-3.5 h-3.5 text-brand-amber shrink-0" />
                         </span>
                       )}
                       {item.trend === 'stable' && (
@@ -119,7 +121,7 @@ export const RiskTable: React.FC<RiskTableProps> = ({ items }) => {
                     <div className="flex items-center gap-1.5 mt-0.5 text-xs text-purple-300/80">
                       <span>{item.category}</span>
                       <span>•</span>
-                      <strong className="text-amber-400 font-semibold">
+                      <strong className="text-brand-amber font-semibold">
                         {formatCurrencyBRL(item.unitPrice)}
                       </strong>
                     </div>
@@ -144,16 +146,16 @@ export const RiskTable: React.FC<RiskTableProps> = ({ items }) => {
 
                 {/* Bloco de Destaque Máximo: Sobra & Prejuízo Previsto */}
                 {hasSurplus ? (
-                  <div className="mt-2.5 bg-amber-400/[0.12] border border-amber-400/40 rounded-xl p-2.5 flex items-center justify-between gap-2">
+                  <div className="mt-2.5 bg-brand-amber/[0.12] border border-brand-amber/40 rounded-xl p-2.5 flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-lg bg-amber-400/20 text-amber-400 flex items-center justify-center shrink-0">
+                      <div className="w-7 h-7 rounded-lg bg-brand-amber/20 text-brand-amber flex items-center justify-center shrink-0">
                         <AlertTriangle className="w-4 h-4 animate-pulse" />
                       </div>
                       <div>
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300 block">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-brand-light block">
                           Sobra Prevista
                         </span>
-                        <span className="text-base font-black text-amber-300 leading-tight">
+                        <span className="text-base font-black text-brand-light leading-tight">
                           +{item.projectedSurplus} un
                         </span>
                       </div>
@@ -163,14 +165,14 @@ export const RiskTable: React.FC<RiskTableProps> = ({ items }) => {
                       <span className="text-[10px] font-semibold text-purple-300/80 block uppercase">
                         Prejuízo Estimado
                       </span>
-                      <span className="text-sm font-extrabold text-amber-400">
+                      <span className="text-sm font-extrabold text-brand-amber">
                         {formatCurrencyBRL(item.estimatedLossValue)}
                       </span>
                     </div>
                   </div>
                 ) : (
-                  <div className="mt-2.5 bg-emerald-500/[0.08] border border-emerald-500/30 rounded-xl p-2 flex items-center gap-2 text-xs text-emerald-300 font-medium">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <div className="mt-2.5 bg-risk-safe/[0.08] border border-risk-safe/30 rounded-xl p-2 flex items-center gap-2 text-xs text-risk-safe font-medium">
+                    <CheckCircle2 className="w-4 h-4 text-risk-safe shrink-0" />
                     <span>Demanda estimada absorve todo o estoque preparado.</span>
                   </div>
                 )}
@@ -186,7 +188,7 @@ export const RiskTable: React.FC<RiskTableProps> = ({ items }) => {
                     <strong className="text-purple-100 font-bold text-xs">{item.sold}</strong>
                   </div>
                   <div className="bg-purple-900/60 rounded-lg p-1.5 border border-purple-700/60">
-                    <span className="text-[10px] text-amber-300 font-bold block">Estoque</span>
+                    <span className="text-[10px] text-brand-light font-bold block">Estoque</span>
                     <strong className="text-white font-extrabold text-xs">{item.currentStock}</strong>
                   </div>
                   <div className="bg-purple-950/50 rounded-lg p-1.5 border border-purple-800/40">
@@ -196,27 +198,27 @@ export const RiskTable: React.FC<RiskTableProps> = ({ items }) => {
                 </div>
               </div>
 
-              {/* Botões de Ação para Celular (Touch targets confortáveis) */}
-              {/* <div className="flex items-center gap-2 pt-2 border-t border-purple-900/40">
+              {/* Botões de Ação para Celular */}
+              <div className="flex items-center gap-2 pt-2 border-t border-purple-900/40">
                 <button
                   onClick={() => simulateIncomingOrder(item.id)}
                   disabled={item.currentStock <= 0}
-                  className="flex-1 flex items-center justify-center gap-1.5 min-h-[40px] px-3 rounded-xl border border-purple-700/70 bg-purple-950/80 active:bg-purple-900 text-purple-200 active:text-amber-300 text-xs font-bold transition-all disabled:opacity-30 disabled:pointer-events-none"
+                  className="flex-1 flex items-center justify-center gap-1.5 min-h-[40px] px-3 rounded-xl border border-purple-700/70 bg-purple-950/80 active:bg-purple-900 text-purple-200 active:text-brand-amber text-xs font-bold transition-all disabled:opacity-30 disabled:pointer-events-none"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                  <Sparkles className="w-3.5 h-3.5 text-brand-amber" />
                   <span>+1 Venda</span>
                 </button>
 
                 {hasSurplus && (
                   <button
                     onClick={() => navigate('/oferta-relampago')}
-                    className="flex-1 flex items-center justify-center gap-1.5 min-h-[40px] px-3 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 active:scale-95 text-purple-950 font-black text-xs shadow-md transition-all"
+                    className="flex-1 flex items-center justify-center gap-1.5 min-h-[40px] px-3 rounded-xl bg-gradient-to-r from-brand-amber to-brand-gold active:scale-95 text-purple-950 font-black text-xs shadow-md transition-all"
                   >
                     <Flame className="w-3.5 h-3.5 fill-purple-950" />
                     <span>Criar Oferta</span>
                   </button>
                 )}
-              </div> */}
+              </div>
             </div>
           )
         })}
@@ -226,7 +228,7 @@ export const RiskTable: React.FC<RiskTableProps> = ({ items }) => {
       {/* 2. VISUALIZAÇÃO EM TABELA (DESKTOP & TABLETS LARGOS)      */}
       {/* ========================================================= */}
       <div
-        className={`w-full overflow-x-auto rounded-xl border border-purple-900/60 bg-[#140a28]/90 shadow-xl ${
+        className={`w-full overflow-x-auto rounded-xl border border-purple-900/60 bg-surface-table/90 shadow-xl ${
           viewMode === 'cards' ? 'hidden' : 'hidden sm:block'
         }`}
       >
@@ -239,15 +241,15 @@ export const RiskTable: React.FC<RiskTableProps> = ({ items }) => {
               <th className="py-3.5 px-3 text-center">Vendido</th>
               <th className="py-3.5 px-3 text-center">Estoque Atual</th>
               <th className="py-3.5 px-3 text-center">Venda Estimada (até Fechamento)</th>
-              <th className="py-3.5 px-4 text-center bg-amber-400/10 text-amber-300 border-x border-amber-400/20">
+              <th className="py-3.5 px-4 text-center bg-brand-amber/10 text-brand-light border-x border-brand-amber/20">
                 <div className="flex items-center justify-center gap-1">
                   <span>Sobra Prevista</span>
-                  <ArrowUpDown className="w-3 h-3 text-amber-400" />
+                  <ArrowUpDown className="w-3 h-3 text-brand-amber" />
                 </div>
               </th>
               <th className="py-3.5 px-4 text-right">Prejuízo Potencial</th>
               <th className="py-3.5 px-4 text-center">Status / Risco</th>
-              {/* <th className="py-3.5 px-4 text-center">Ações Rápidas</th> */}
+              <th className="py-3.5 px-4 text-center">Ações Rápidas</th>
             </tr>
           </thead>
 
@@ -263,7 +265,7 @@ export const RiskTable: React.FC<RiskTableProps> = ({ items }) => {
                   key={item.id}
                   className={`transition-colors group ${
                     isCritical
-                      ? 'bg-amber-400/[0.07] hover:bg-amber-400/[0.13] border-l-4 border-l-amber-400'
+                      ? 'bg-brand-amber/[0.07] hover:bg-brand-amber/[0.13] border-l-4 border-l-brand-amber'
                       : isModerate
                       ? 'bg-purple-900/[0.15] hover:bg-purple-900/[0.3] border-l-4 border-l-purple-500'
                       : 'hover:bg-purple-950/50 border-l-4 border-l-transparent'
@@ -274,10 +276,10 @@ export const RiskTable: React.FC<RiskTableProps> = ({ items }) => {
                     <div className="flex items-center gap-3">
                       {isCritical ? (
                         <div
-                          className="w-8 h-8 rounded-lg bg-amber-400/20 border border-amber-400/40 flex items-center justify-center text-amber-300 shrink-0"
+                          className="w-8 h-8 rounded-lg bg-brand-amber/20 border border-brand-amber/40 flex items-center justify-center text-brand-light shrink-0"
                           title="Item em risco crítico de sobra e desperdício"
                         >
-                          <AlertTriangle className="w-4 h-4 text-amber-400 animate-pulse" />
+                          <AlertTriangle className="w-4 h-4 text-brand-amber animate-pulse" />
                         </div>
                       ) : isModerate ? (
                         <div
@@ -288,7 +290,7 @@ export const RiskTable: React.FC<RiskTableProps> = ({ items }) => {
                         </div>
                       ) : (
                         <div
-                          className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0"
+                          className="w-8 h-8 rounded-lg bg-risk-safe/10 border border-risk-safe/30 flex items-center justify-center text-risk-safe shrink-0"
                           title="Demanda absorve o estoque projetado"
                         >
                           <CheckCircle2 className="w-4 h-4" />
@@ -296,17 +298,17 @@ export const RiskTable: React.FC<RiskTableProps> = ({ items }) => {
                       )}
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-white text-sm group-hover:text-amber-300 transition-colors">
+                          <span className="font-bold text-white text-sm group-hover:text-brand-light transition-colors">
                             {item.name}
                           </span>
                           {item.trend === 'up' && (
                             <span title="Ritmo de saída acelerado">
-                              <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
+                              <TrendingUp className="w-3.5 h-3.5 text-risk-safe" />
                             </span>
                           )}
                           {item.trend === 'down' && (
                             <span title="Ritmo de saída abaixo da média">
-                              <TrendingDown className="w-3.5 h-3.5 text-amber-400" />
+                              <TrendingDown className="w-3.5 h-3.5 text-brand-amber" />
                             </span>
                           )}
                           {item.trend === 'stable' && (
@@ -320,7 +322,7 @@ export const RiskTable: React.FC<RiskTableProps> = ({ items }) => {
                             {item.category}
                           </span>
                           <span className="text-purple-500">•</span>
-                          <span className="text-xs text-amber-400/90 font-medium">
+                          <span className="text-xs text-brand-amber font-medium">
                             {formatCurrencyBRL(item.unitPrice)}
                           </span>
                         </div>
@@ -366,18 +368,18 @@ export const RiskTable: React.FC<RiskTableProps> = ({ items }) => {
                   </td>
 
                   {/* 6. Sobra Prevista (DESTAQUE MÁXIMO) */}
-                  <td className="py-3 px-4 text-center bg-amber-400/[0.08] border-x border-amber-400/20">
+                  <td className="py-3 px-4 text-center bg-brand-amber/[0.08] border-x border-brand-amber/20">
                     {hasSurplus ? (
                       <div className="inline-flex flex-col items-center">
-                        <span className="font-black text-base text-amber-300 flex items-center gap-1 drop-shadow-sm">
+                        <span className="font-black text-base text-brand-light flex items-center gap-1 drop-shadow-sm">
                           +{item.projectedSurplus} un
                         </span>
-                        <span className="text-[10px] uppercase font-bold tracking-wider text-amber-400/90 bg-amber-400/20 px-1.5 py-0.2 rounded border border-amber-400/40">
+                        <span className="text-[10px] uppercase font-bold tracking-wider text-brand-amber bg-brand-amber/20 px-1.5 py-0.2 rounded border border-brand-amber/40">
                           Vai Sobrar
                         </span>
                       </div>
                     ) : (
-                      <span className="text-xs text-emerald-400/90 font-medium inline-flex items-center gap-1">
+                      <span className="text-xs text-risk-safe font-medium inline-flex items-center gap-1">
                         <CheckCircle2 className="w-3.5 h-3.5" />
                         Esgota / 0 sobra
                       </span>
@@ -387,7 +389,7 @@ export const RiskTable: React.FC<RiskTableProps> = ({ items }) => {
                   {/* 7. Prejuízo Potencial */}
                   <td className="py-3 px-4 text-right">
                     {hasSurplus ? (
-                      <span className="font-bold text-amber-400 text-sm">
+                      <span className="font-bold text-brand-amber text-sm">
                         {formatCurrencyBRL(item.estimatedLossValue)}
                       </span>
                     ) : (
@@ -413,24 +415,22 @@ export const RiskTable: React.FC<RiskTableProps> = ({ items }) => {
                   </td>
 
                   {/* 9. Ações Rápidas */}
-                  {/*td className="py-3 px-4 text-center">
+                  <td className="py-3 px-4 text-center">
                     <div className="flex items-center justify-center gap-1.5">
-                      
                       <button
                         onClick={() => simulateIncomingOrder(item.id)}
                         disabled={item.currentStock <= 0}
                         title="Simular pedido deste item para ver recálculo"
-                        className="p-1.5 rounded-lg border border-purple-700/60 bg-purple-950/60 text-purple-300 hover:text-amber-300 hover:border-amber-400/50 hover:bg-purple-900/60 text-xs font-semibold disabled:opacity-30 disabled:pointer-events-none transition-all min-h-[32px] min-w-[32px] flex items-center justify-center"
+                        className="p-1.5 rounded-lg border border-purple-700/60 bg-purple-950/60 text-purple-300 hover:text-brand-light hover:border-brand-amber/50 hover:bg-purple-900/60 text-xs font-semibold disabled:opacity-30 disabled:pointer-events-none transition-all min-h-[32px] min-w-[32px] flex items-center justify-center"
                       >
-                        <Sparkles className="w-3.5 h-3.5" />
+                        <Sparkles className="w-3.5 h-3.5 text-brand-amber" />
                       </button>
 
-                      
                       {hasSurplus ? (
                         <button
                           onClick={() => navigate('/oferta-relampago')}
                           title="Criar Oferta Relâmpago para este item"
-                          className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-400 hover:bg-amber-300 text-purple-950 font-bold text-xs shadow-sm transition-all active:scale-95 min-h-[32px]"
+                          className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-brand-amber hover:bg-brand-light text-purple-950 font-bold text-xs shadow-sm transition-all active:scale-95 min-h-[32px]"
                         >
                           <Flame className="w-3.5 h-3.5 fill-purple-950" />
                           <span>Ofertar</span>
@@ -439,8 +439,7 @@ export const RiskTable: React.FC<RiskTableProps> = ({ items }) => {
                         <span className="text-xs text-purple-400/40">—</span>
                       )}
                     </div>
-                  </td>*/}
-                  
+                  </td>
                 </tr>
               )
             })}

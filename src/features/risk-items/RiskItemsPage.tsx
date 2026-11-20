@@ -93,10 +93,10 @@ export const RiskItemsPage: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-xl sm:text-3xl font-black text-white tracking-tight">
-              Itens em <span className="text-amber-400">Risco</span>
+              Itens em <span className="text-brand-amber">Risco</span>
             </h1>
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-400/15 border border-amber-400/40 text-amber-300 text-[11px] sm:text-xs font-bold animate-pulse">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-brand-amber/15 border border-brand-amber/40 text-brand-light text-[11px] sm:text-xs font-bold animate-pulse">
+              <span className="w-1.5 h-1.5 rounded-full bg-brand-amber" />
               Ao Vivo
             </span>
           </div>
@@ -106,12 +106,12 @@ export const RiskItemsPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Action Controls (Otimizado para Touch no Mobile) */}
+        {/* Action Controls */}
         <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full md:w-auto">
           <button
             onClick={resetToDefault}
             title="Reiniciar dados da demonstração"
-            className="flex items-center justify-center gap-1.5 min-h-[42px] sm:min-h-[38px] px-3 py-2 rounded-xl bg-purple-950/70 border border-purple-800/70 text-purple-200 hover:text-amber-300 active:bg-purple-900 text-xs font-semibold transition-all"
+            className="btn-secondary flex items-center justify-center gap-1.5 min-h-[42px] sm:min-h-[38px] text-xs"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             <span>Resetar</span>
@@ -119,7 +119,7 @@ export const RiskItemsPage: React.FC = () => {
 
           <button
             onClick={() => navigate('/oferta-relampago')}
-            className="flex items-center justify-center gap-1.5 min-h-[42px] sm:min-h-[38px] px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 active:scale-95 text-purple-950 font-black text-xs shadow-[0_0_15px_rgba(251,191,36,0.25)] transition-all truncate"
+            className="btn-primary flex items-center justify-center gap-1.5 min-h-[42px] sm:min-h-[38px] text-xs truncate"
           >
             <Flame className="w-4 h-4 fill-purple-950 shrink-0" />
             <span className="truncate">Ofertas ({surplusCount})</span>
@@ -134,10 +134,10 @@ export const RiskItemsPage: React.FC = () => {
       <RecentOrdersTicker />
 
       {/* Search, Filter Bar and Table Card Container */}
-      <div className="bg-[#160b2e]/90 border border-purple-900/60 rounded-2xl p-3 sm:p-5 shadow-lg space-y-3.5 sm:space-y-4">
+      <div className="panel-surface p-3 sm:p-5 space-y-3.5 sm:space-y-4">
         {/* Barra de Busca e Filtros */}
         <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-2.5 sm:gap-3">
-          {/* Caixa de Busca (text-base no mobile evita zoom indesejado no iOS) */}
+          {/* Caixa de Busca */}
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-purple-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
@@ -148,12 +148,12 @@ export const RiskItemsPage: React.FC = () => {
                 setCurrentPage(1)
               }}
               placeholder="Buscar por produto ou categoria..."
-              className="w-full bg-purple-950/80 border border-purple-800/60 focus:border-amber-400 rounded-xl pl-10 pr-9 py-2.5 text-base sm:text-sm text-purple-100 placeholder-purple-400/50 focus:outline-none transition-colors"
+              className="w-full bg-purple-950/80 border border-purple-800/60 focus:border-brand-amber rounded-xl pl-10 pr-9 py-2.5 text-base sm:text-sm text-purple-100 placeholder-purple-400/50 focus:outline-none transition-colors"
             />
             {searchTerm && (
               <button
                 onClick={() => setSearchTerm('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-purple-400 hover:text-amber-300 p-1"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-purple-400 hover:text-brand-light p-1"
                 aria-label="Limpar busca"
               >
                 <X className="w-3.5 h-3.5" />
@@ -161,7 +161,7 @@ export const RiskItemsPage: React.FC = () => {
             )}
           </div>
 
-          {/* Filtros em Pílula (Carrossel touch horizontal no mobile) */}
+          {/* Filtros em Pílula */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1.5 lg:pb-0 text-xs scrollbar-none touch-pan-x -mx-1 px-1 sm:mx-0 sm:px-0">
             <span className="text-purple-400 flex items-center gap-1 shrink-0 font-medium mr-0.5 hidden xs:flex">
               <Filter className="w-3.5 h-3.5" />
@@ -174,8 +174,8 @@ export const RiskItemsPage: React.FC = () => {
               }}
               className={`min-h-[36px] px-3 py-1.5 rounded-xl font-semibold transition-all shrink-0 flex items-center gap-1 ${
                 filterType === 'ALL'
-                  ? 'bg-amber-400 text-purple-950 shadow-sm font-bold'
-                  : 'bg-purple-950/70 border border-purple-800/60 text-purple-300 active:bg-purple-900 hover:text-amber-300'
+                  ? 'bg-brand-amber text-purple-950 shadow-sm font-bold'
+                  : 'bg-purple-950/70 border border-purple-800/60 text-purple-300 active:bg-purple-900 hover:text-brand-light'
               }`}
             >
               <span>Todos</span>
@@ -189,8 +189,8 @@ export const RiskItemsPage: React.FC = () => {
               }}
               className={`min-h-[36px] flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-semibold transition-all shrink-0 ${
                 filterType === 'SURPLUS'
-                  ? 'bg-amber-400 text-purple-950 shadow-sm font-bold'
-                  : 'bg-purple-950/70 border border-amber-400/30 text-amber-300 active:bg-purple-900 hover:border-amber-400/60'
+                  ? 'bg-brand-amber text-purple-950 shadow-sm font-bold'
+                  : 'bg-purple-950/70 border border-brand-amber/30 text-brand-light active:bg-purple-900 hover:border-brand-amber/60'
               }`}
             >
               <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
@@ -205,8 +205,8 @@ export const RiskItemsPage: React.FC = () => {
               }}
               className={`min-h-[36px] flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-semibold transition-all shrink-0 ${
                 filterType === 'CRITICAL'
-                  ? 'bg-amber-400 text-purple-950 shadow-sm font-bold'
-                  : 'bg-purple-950/70 border border-purple-800/60 text-purple-300 active:bg-purple-900 hover:text-amber-300'
+                  ? 'bg-brand-amber text-purple-950 shadow-sm font-bold'
+                  : 'bg-purple-950/70 border border-purple-800/60 text-purple-300 active:bg-purple-900 hover:text-brand-light'
               }`}
             >
               <span>Críticos</span>
@@ -220,8 +220,8 @@ export const RiskItemsPage: React.FC = () => {
               }}
               className={`min-h-[36px] flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-semibold transition-all shrink-0 ${
                 filterType === 'SAFE'
-                  ? 'bg-amber-400 text-purple-950 shadow-sm font-bold'
-                  : 'bg-purple-950/70 border border-purple-800/60 text-purple-300 active:bg-purple-900 hover:text-emerald-300'
+                  ? 'bg-brand-amber text-purple-950 shadow-sm font-bold'
+                  : 'bg-purple-950/70 border border-purple-800/60 text-purple-300 active:bg-purple-900 hover:text-risk-safe'
               }`}
             >
               <span>Equilibrados</span>
@@ -230,15 +230,15 @@ export const RiskItemsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Banner Informativo (Compacto no Mobile) */}
+        {/* Banner Informativo */}
         <div className="bg-purple-950/60 border border-purple-800/40 rounded-xl p-2.5 sm:p-3 flex items-start sm:items-center justify-between gap-2 text-xs text-purple-200">
           <div className="flex items-center gap-2 min-w-0">
-            <Info className="w-4 h-4 text-amber-400 shrink-0 mt-0.5 sm:mt-0" />
+            <Info className="w-4 h-4 text-brand-amber shrink-0 mt-0.5 sm:mt-0" />
             <span className="text-[11px] sm:text-xs leading-snug">
               <strong>Prioridade Ativa:</strong> Itens que vão sobrar aparecem sempre nas primeiras páginas e no topo antes do fechamento ({config.closingTime}).
             </span>
           </div>
-          <span className="hidden md:inline-flex items-center gap-1 text-[11px] text-amber-300 font-semibold bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/30 shrink-0">
+          <span className="hidden md:inline-flex items-center gap-1 text-[11px] text-brand-light font-semibold bg-brand-amber/10 px-2 py-0.5 rounded border border-brand-amber/30 shrink-0">
             <Clock className="w-3 h-3" />
             Janela: Últimas {config.offerWindowHours}h
           </span>
@@ -247,7 +247,7 @@ export const RiskItemsPage: React.FC = () => {
         {/* Tabela / Cards de Risco */}
         <RiskTable items={paginatedItems} />
 
-        {/* Controles de Paginação com Suporte Mobile Completo */}
+        {/* Controles de Paginação */}
         <Pagination
           currentPage={adjustedCurrentPage}
           totalPages={totalPages}

@@ -1,1 +1,52 @@
 @import "tailwindcss";
+
+@theme {
+  /* Cores de Superfície & Fundos (Deep Purple Canvas) */
+  --color-surface-base: #0e061c;
+  --color-surface-header: #120824;
+  --color-surface-table: #140a28;
+  --color-surface-panel: #160b2e;
+  --color-surface-card: #1b0d30;
+
+  /* Gradientes de Superfície para Cards de Risco */
+  --color-surface-critical: #1d0d38;
+  --color-surface-critical-mid: #170a2c;
+  --color-surface-critical-end: #120722;
+  --color-surface-moderate: #190d33;
+  --color-surface-moderate-mid: #140826;
+  --color-surface-moderate-end: #10061e;
+
+  /* Cores de Ação, Destaque & Brand (Amarelo / Dourado) */
+  --color-brand-yellow: #facc15;
+  --color-brand-amber: #fbbf24;
+  --color-brand-gold: #f59e0b;
+  --color-brand-light: #fcd34d;
+
+  /* Cores Semânticas de Risco & Status */
+  --color-risk-critical: #fbbf24;
+  --color-risk-moderate: #a855f7;
+  --color-risk-safe: #34d399;
+}
+
+/* Classes utilitárias reutilizáveis */
+@layer components {
+  /* Botão Primário */
+  .btn-primary {
+    @apply bg-gradient-to-r from-brand-amber to-brand-gold hover:from-brand-light hover:to-brand-yellow text-purple-950 font-black px-4 py-2 rounded-xl shadow-[0_0_15px_rgba(251,191,36,0.25)] transition-all active:scale-95;
+  }
+
+  /* Botão Secundário / Outline */
+  .btn-secondary {
+    @apply bg-purple-950/70 border border-purple-800/70 text-purple-200 hover:text-brand-amber hover:border-brand-amber/40 px-3.5 py-2 rounded-xl font-semibold transition-all active:bg-purple-900;
+  }
+
+  /* Card Base com Gradiente e Borda da Aplicação */
+  .card-surface {
+    @apply bg-gradient-to-br from-purple-950/90 via-purple-900/40 to-surface-card border border-purple-800/60 rounded-2xl shadow-lg;
+  }
+
+  /* Painel Principal de Conteúdo */
+  .panel-surface {
+    @apply bg-surface-panel border border-purple-900/60 rounded-2xl shadow-lg;
+  }
+}

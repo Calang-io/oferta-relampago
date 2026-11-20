@@ -22,13 +22,13 @@ export const Badge: React.FC<BadgeProps> = ({
 
   const variantClasses = {
     critical:
-      'bg-amber-400/15 text-amber-300 border border-amber-400/40 shadow-[0_0_12px_rgba(251,191,36,0.15)]',
+      'bg-brand-amber/15 text-brand-light border border-brand-amber/40 shadow-[0_0_12px_rgba(251,191,36,0.15)]',
     moderate:
-      'bg-purple-500/20 text-purple-200 border border-purple-400/30',
+      'bg-risk-moderate/20 text-purple-200 border border-purple-400/30',
     safe:
-      'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30',
+      'bg-risk-safe/15 text-risk-safe border border-risk-safe/30',
     yellow:
-      'bg-amber-400 text-purple-950 font-bold border border-amber-300 shadow-sm',
+      'bg-brand-amber text-purple-950 font-bold border border-brand-light shadow-sm',
     purple:
       'bg-purple-900/60 text-purple-200 border border-purple-700/50',
     neutral:
@@ -36,9 +36,9 @@ export const Badge: React.FC<BadgeProps> = ({
   }
 
   const dotColors = {
-    critical: 'bg-amber-400 animate-pulse',
+    critical: 'bg-brand-amber animate-pulse',
     moderate: 'bg-purple-400',
-    safe: 'bg-emerald-400',
+    safe: 'bg-risk-safe',
     yellow: 'bg-purple-950',
     purple: 'bg-purple-400',
     neutral: 'bg-slate-400',

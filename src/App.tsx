@@ -7,7 +7,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <StoreProvider>
-        <div className="min-h-screen bg-[#0e061c] text-purple-100 antialiased selection:bg-amber-400 selection:text-purple-950 font-sans">
+        <div className="min-h-screen bg-surface-base text-purple-100 antialiased selection:bg-brand-amber selection:text-purple-950 font-sans">
           {/* Header com Navegação e Status */}
           <Header />
 

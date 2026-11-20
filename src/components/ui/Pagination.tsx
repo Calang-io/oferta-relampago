@@ -30,8 +30,8 @@ export const Pagination: React.FC<PaginationProps> = ({
       {/* Informações de Contagem e Seletor de Página */}
       <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
         <span className="text-xs text-purple-200">
-          Mostrando <strong className="text-amber-400 font-bold">{startItem}</strong>-
-          <strong className="text-amber-400 font-bold">{endItem}</strong> de{' '}
+          Mostrando <strong className="text-brand-amber font-bold">{startItem}</strong>-
+          <strong className="text-brand-amber font-bold">{endItem}</strong> de{' '}
           <strong className="text-white font-bold">{totalItems}</strong>
         </span>
 
@@ -42,7 +42,7 @@ export const Pagination: React.FC<PaginationProps> = ({
               value={pageSize}
               onChange={(e) => onPageSizeChange(Number(e.target.value))}
               aria-label="Itens por página"
-              className="bg-purple-950 border border-purple-700/60 text-amber-300 rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-amber-400 cursor-pointer min-h-[32px]"
+              className="bg-purple-950 border border-purple-700/60 text-brand-light rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-brand-amber cursor-pointer min-h-[32px]"
             >
               {pageSizeOptions.map((opt) => (
                 <option key={opt} value={opt} className="bg-purple-950 text-purple-100">
@@ -59,23 +59,23 @@ export const Pagination: React.FC<PaginationProps> = ({
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="flex-1 flex items-center justify-center gap-1 min-h-[40px] px-3 rounded-xl border border-purple-800/80 bg-purple-950/70 text-purple-200 active:bg-purple-900 active:text-amber-300 disabled:opacity-30 disabled:pointer-events-none text-xs font-semibold transition-all"
+          className="flex-1 flex items-center justify-center gap-1 min-h-[40px] px-3 rounded-xl border border-purple-800/80 bg-purple-950/70 text-purple-200 active:bg-purple-900 active:text-brand-amber disabled:opacity-30 disabled:pointer-events-none text-xs font-semibold transition-all"
         >
-          <ChevronLeft className="w-4 h-4 text-amber-400" />
+          <ChevronLeft className="w-4 h-4 text-brand-amber" />
           <span>Anterior</span>
         </button>
 
         <span className="text-xs text-purple-200 font-semibold px-2 shrink-0">
-          <strong className="text-amber-400">{currentPage}</strong> / {totalPages}
+          <strong className="text-brand-amber">{currentPage}</strong> / {totalPages}
         </span>
 
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages || totalPages === 0}
-          className="flex-1 flex items-center justify-center gap-1 min-h-[40px] px-3 rounded-xl border border-purple-800/80 bg-purple-950/70 text-purple-200 active:bg-purple-900 active:text-amber-300 disabled:opacity-30 disabled:pointer-events-none text-xs font-semibold transition-all"
+          className="flex-1 flex items-center justify-center gap-1 min-h-[40px] px-3 rounded-xl border border-purple-800/80 bg-purple-950/70 text-purple-200 active:bg-purple-900 active:text-brand-amber disabled:opacity-30 disabled:pointer-events-none text-xs font-semibold transition-all"
         >
           <span>Próxima</span>
-          <ChevronRight className="w-4 h-4 text-amber-400" />
+          <ChevronRight className="w-4 h-4 text-brand-amber" />
         </button>
       </div>
 
@@ -86,7 +86,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           disabled={currentPage === 1}
           title="Primeira página"
           aria-label="Primeira página"
-          className="p-1.5 rounded-lg border border-purple-800/60 bg-purple-950/50 text-purple-300 hover:text-amber-400 hover:border-amber-400/40 disabled:opacity-30 disabled:pointer-events-none transition-colors min-h-[34px] min-w-[34px] flex items-center justify-center"
+          className="p-1.5 rounded-lg border border-purple-800/60 bg-purple-950/50 text-purple-300 hover:text-brand-amber hover:border-brand-amber/40 disabled:opacity-30 disabled:pointer-events-none transition-colors min-h-[34px] min-w-[34px] flex items-center justify-center"
         >
           <ChevronsLeft className="w-4 h-4" />
         </button>
@@ -96,7 +96,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           disabled={currentPage === 1}
           title="Página anterior"
           aria-label="Página anterior"
-          className="p-1.5 rounded-lg border border-purple-800/60 bg-purple-950/50 text-purple-300 hover:text-amber-400 hover:border-amber-400/40 disabled:opacity-30 disabled:pointer-events-none transition-colors min-h-[34px] min-w-[34px] flex items-center justify-center"
+          className="p-1.5 rounded-lg border border-purple-800/60 bg-purple-950/50 text-purple-300 hover:text-brand-amber hover:border-brand-amber/40 disabled:opacity-30 disabled:pointer-events-none transition-colors min-h-[34px] min-w-[34px] flex items-center justify-center"
         >
           <ChevronLeft className="w-4 h-4" />
         </button>
@@ -128,8 +128,8 @@ export const Pagination: React.FC<PaginationProps> = ({
                 aria-current={isActive ? 'page' : undefined}
                 className={`min-w-8 h-8 px-2 text-xs font-semibold rounded-lg transition-all ${
                   isActive
-                    ? 'bg-amber-400 text-purple-950 font-bold shadow-[0_0_12px_rgba(251,191,36,0.35)] scale-105'
-                    : 'bg-purple-950/60 border border-purple-800/50 text-purple-200 hover:bg-purple-900/60 hover:text-amber-300'
+                    ? 'bg-brand-amber text-purple-950 font-bold shadow-[0_0_12px_rgba(251,191,36,0.35)] scale-105'
+                    : 'bg-purple-950/60 border border-purple-800/50 text-purple-200 hover:bg-purple-900/60 hover:text-brand-light'
                 }`}
               >
                 {pageNum}
@@ -143,7 +143,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           disabled={currentPage === totalPages || totalPages === 0}
           title="Próxima página"
           aria-label="Próxima página"
-          className="p-1.5 rounded-lg border border-purple-800/60 bg-purple-950/50 text-purple-300 hover:text-amber-400 hover:border-amber-400/40 disabled:opacity-30 disabled:pointer-events-none transition-colors min-h-[34px] min-w-[34px] flex items-center justify-center"
+          className="p-1.5 rounded-lg border border-purple-800/60 bg-purple-950/50 text-purple-300 hover:text-brand-amber hover:border-brand-amber/40 disabled:opacity-30 disabled:pointer-events-none transition-colors min-h-[34px] min-w-[34px] flex items-center justify-center"
         >
           <ChevronRight className="w-4 h-4" />
         </button>
@@ -153,7 +153,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           disabled={currentPage === totalPages || totalPages === 0}
           title="Última página"
           aria-label="Última página"
-          className="p-1.5 rounded-lg border border-purple-800/60 bg-purple-950/50 text-purple-300 hover:text-amber-400 hover:border-amber-400/40 disabled:opacity-30 disabled:pointer-events-none transition-colors min-h-[34px] min-w-[34px] flex items-center justify-center"
+          className="p-1.5 rounded-lg border border-purple-800/60 bg-purple-950/50 text-purple-300 hover:text-brand-amber hover:border-brand-amber/40 disabled:opacity-30 disabled:pointer-events-none transition-colors min-h-[34px] min-w-[34px] flex items-center justify-center"
         >
           <ChevronsRight className="w-4 h-4" />
         </button>
