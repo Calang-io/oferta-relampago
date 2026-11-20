@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { StoreProvider } from './context/StoreContext'
 import { Header } from './components/layout/Header'
 import { RiskItemsPage } from './features/risk-items/RiskItemsPage'
+import { ResultsPage } from './features/results/ResultsPage'
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
               <Route path="/" element={<Navigate to="/itens-em-risco" replace />} />
               <Route path="/itens-em-risco" element={<RiskItemsPage />} />
               <Route path="*" element={<Navigate to="/itens-em-risco" replace />} />
+              <Route path="/resultados" element={<ResultsPage />} />
             </Routes>
           </main>
         </div>
