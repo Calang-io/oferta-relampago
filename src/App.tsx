@@ -3,6 +3,7 @@ import { StoreProvider } from './context/StoreContext'
 import { Header } from './components/layout/Header'
 import { RiskItemsPage } from './features/risk-items/RiskItemsPage'
 import { ResultsPage } from './features/results/ResultsPage'
+import { SettingsPage } from './features/settings/SettingsPage'
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
             <Routes>
               <Route path="/" element={<Navigate to="/itens-em-risco" replace />} />
               <Route path="/itens-em-risco" element={<RiskItemsPage />} />
+              <Route path="/configuracao" element={<SettingsPage />} />
               <Route path="*" element={<Navigate to="/itens-em-risco" replace />} />
               <Route path="/resultados" element={<ResultsPage />} />
             </Routes>
