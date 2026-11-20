@@ -1,12 +1,20 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react'
-import type { RiskItem, StoreConfig, StoreOrder } from '../types/risk'
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import type { RiskItem, StoreOrder } from '../types/risk'
 import { getInitialItems } from '../mocks/mockData'
 import { calculateRisk } from '../utils/calculations'
+import { applyProduction, loadSettings, persistSettings, restaurantDate, validateConfig, validateProduction } from '../features/settings/settings-model'
+import type { DailyProduction, OperationConfig } from '../features/settings/settings-model'
+import { DEMO_HISTORICAL_AVERAGES } from '../features/settings/demo-history'
 
 interface StoreContextType {
   items: RiskItem[]
   recentOrders: StoreOrder[]
-  config: StoreConfig
+  config: OperationConfig
+  production: DailyProduction | null
+  productionDate: string
+  historicalAverages: Record<string, number | null>
+  updateConfig: (config: OperationConfig) => void
+  confirmProduction: (quantities: Record<string, number>) => void
   lastUpdated: Date
   isLiveSimulationActive: boolean
   toggleLiveSimulation: () => void
@@ -25,19 +33,54 @@ interface StoreContextType {
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined)
 
-const DEFAULT_CONFIG: StoreConfig = {
-  closingTime: '22:00',
-  offerWindowHours: 2,
-  maxDiscountPercentage: 50,
-}
-
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [items, setItems] = useState<RiskItem[]>(() => getInitialItems())
+  const [settingsSnapshot, setSettingsSnapshot] = useState(loadSettings)
+  const snapshotRef = useRef(settingsSnapshot)
+  const [productionDate, setProductionDate] = useState(restaurantDate)
+  const [items, setItems] = useState<RiskItem[]>(() => applyProduction(getInitialItems(), settingsSnapshot.production, DEMO_HISTORICAL_AVERAGES, productionDate))
   const [recentOrders, setRecentOrders] = useState<StoreOrder[]>([])
-  const [config] = useState<StoreConfig>(DEFAULT_CONFIG)
-  const [lastUpdated, setLastUpdated] = useState<Date>(new Date())
+  const config = settingsSnapshot.config
+  const production = settingsSnapshot.production
+  const [lastUpdated, setLastUpdated] = useState<Date>(() => new Date())
   // Aplicação sempre com autopedido ON por padrão contínuo
   const [isLiveSimulationActive, setIsLiveSimulationActive] = useState<boolean>(true)
+
+  const updateConfig = (nextConfig: OperationConfig) => {
+    if (Object.keys(validateConfig(nextConfig)).length) throw new Error('Configurações inválidas.')
+    const next = { ...snapshotRef.current, config: structuredClone(nextConfig) }
+    persistSettings(next)
+    snapshotRef.current = next
+    setSettingsSnapshot(next)
+    setLastUpdated(new Date())
+  }
+
+  const confirmProduction = (quantities: Record<string, number>) => {
+    const today = restaurantDate()
+    if (today !== productionDate) throw new Error('O dia mudou. Confira a produção novamente.')
+    if (Object.keys(validateProduction(quantities, items)).length) throw new Error('Revise os totais: novos pedidos podem ter entrado.')
+    const nextProduction: DailyProduction = { date: today, quantities: structuredClone(quantities), confirmedAt: new Date().toISOString() }
+    const next = { ...snapshotRef.current, production: nextProduction }
+    persistSettings(next)
+    snapshotRef.current = next
+    setSettingsSnapshot(next)
+    setItems(previous => applyProduction(previous, nextProduction, DEMO_HISTORICAL_AVERAGES, today))
+    setLastUpdated(new Date())
+  }
+
+  // A confirmação e os pedidos simulados pertencem ao dia do restaurante.
+  useEffect(() => {
+    const checkDate = () => {
+      const today = restaurantDate()
+      if (today === productionDate) return
+      setProductionDate(today)
+      setItems(previous => applyProduction(previous.map(item => ({ ...item, sold: 0, lastOrderAt: undefined })), snapshotRef.current.production, DEMO_HISTORICAL_AVERAGES, today))
+      setRecentOrders([])
+      setLastUpdated(new Date())
+    }
+    const timer = window.setInterval(checkDate, 15000)
+    window.addEventListener('focus', checkDate)
+    return () => { window.clearInterval(timer); window.removeEventListener('focus', checkDate) }
+  }, [productionDate])
 
   // Dispara um novo pedido em tempo real
   const simulateIncomingOrder = useCallback((specificItemId?: string) => {
@@ -129,7 +172,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }
 
   const resetToDefault = () => {
-    setItems(getInitialItems())
+    setItems(applyProduction(getInitialItems(), production, DEMO_HISTORICAL_AVERAGES, productionDate))
     setRecentOrders([])
     setLastUpdated(new Date())
   }
@@ -171,6 +214,11 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         items,
         recentOrders,
         config,
+        production,
+        productionDate,
+        historicalAverages: DEMO_HISTORICAL_AVERAGES,
+        updateConfig,
+        confirmProduction,
         lastUpdated,
         isLiveSimulationActive,
         toggleLiveSimulation,
