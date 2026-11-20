@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import type { RiskItem, StoreOrder } from '../types/risk'
 import { getInitialItems } from '../mocks/mockData'
-import { calculateRisk } from '../utils/calculations'
 import { applyProduction, loadSettings, persistSettings, restaurantDate, validateConfig, validateProduction } from '../features/settings/settings-model'
 import type { DailyProduction, OperationConfig } from '../features/settings/settings-model'
 import { DEMO_HISTORICAL_AVERAGES } from '../features/settings/demo-history'
+import { getFlashDeals, getOfferWindow, placeInventoryOrder, rebaseOffers, reconcileOffers, reconfigureOffers } from '../features/flash-deals/flash-deals-model'
+import type { OfferBook } from '../features/flash-deals/flash-deals-model'
 
 interface StoreContextType {
   items: RiskItem[]
@@ -20,6 +21,13 @@ interface StoreContextType {
   toggleLiveSimulation: () => void
   simulateIncomingOrder: (specificItemId?: string) => void
   resetToDefault: () => void
+  flashDeals: ReturnType<typeof getFlashDeals>
+  offerWindow: ReturnType<typeof getOfferWindow>
+  offersPaused: boolean
+  now: Date
+  toggleOffersPaused: () => void
+  toggleOfferPaused: (itemId: string) => void
+  purchaseFlashDeal: (itemId: string) => void
   summary: {
     totalSurplusUnits: number
     totalLossValue: number
@@ -37,21 +45,55 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [settingsSnapshot, setSettingsSnapshot] = useState(loadSettings)
   const snapshotRef = useRef(settingsSnapshot)
   const [productionDate, setProductionDate] = useState(restaurantDate)
-  const [items, setItems] = useState<RiskItem[]>(() => applyProduction(getInitialItems(), settingsSnapshot.production, DEMO_HISTORICAL_AVERAGES, productionDate))
-  const [recentOrders, setRecentOrders] = useState<StoreOrder[]>([])
   const config = settingsSnapshot.config
   const production = settingsSnapshot.production
-  const [lastUpdated, setLastUpdated] = useState<Date>(() => new Date())
+  const [now, setNow] = useState(() => new Date())
+  const [inventory, setInventory] = useState(() => {
+    const items = applyProduction(getInitialItems(), settingsSnapshot.production, DEMO_HISTORICAL_AVERAGES, productionDate)
+    const offers: OfferBook = reconcileOffers({ cycle: '', paused: false, pausedItems: [], allocations: [] }, items, config, new Date())
+    return { items, recentOrders: [] as StoreOrder[], lastUpdated: new Date(), offers }
+  })
+  const { items, recentOrders, lastUpdated } = inventory
+  const offerWindow = getOfferWindow(config, now)
+  const offerBook = reconcileOffers(inventory.offers, items, config, now)
+  const flashDeals = getFlashDeals(offerBook, items, config, now)
+
+  // O relógio pertence ao contexto: ofertas continuam atualizando em outras telas.
+  useEffect(() => {
+    const tick = () => {
+      const timestamp = new Date()
+      setNow(timestamp)
+      setInventory(previous => {
+        const offers = reconcileOffers(previous.offers, previous.items, config, timestamp)
+        return offers === previous.offers ? previous : { ...previous, offers }
+      })
+    }
+    const timer = window.setInterval(tick, 1000)
+    window.addEventListener('focus', tick)
+    return () => { window.clearInterval(timer); window.removeEventListener('focus', tick) }
+  }, [config])
+
+  const toggleOffersPaused = () => setInventory(previous => {
+    const offers = reconcileOffers(previous.offers, previous.items, config, new Date())
+    return { ...previous, offers: { ...offers, paused: !offers.paused } }
+  })
+
+  const toggleOfferPaused = (itemId: string) => setInventory(previous => {
+    const offers = reconcileOffers(previous.offers, previous.items, config, new Date())
+    const pausedItems = offers.pausedItems.includes(itemId) ? offers.pausedItems.filter(id => id !== itemId) : [...offers.pausedItems, itemId]
+    return { ...previous, offers: { ...offers, pausedItems } }
+  })
   // Aplicação sempre com autopedido ON por padrão contínuo
   const [isLiveSimulationActive, setIsLiveSimulationActive] = useState<boolean>(true)
 
   const updateConfig = (nextConfig: OperationConfig) => {
     if (Object.keys(validateConfig(nextConfig)).length) throw new Error('Configurações inválidas.')
+    const previousConfig = snapshotRef.current.config
     const next = { ...snapshotRef.current, config: structuredClone(nextConfig) }
     persistSettings(next)
     snapshotRef.current = next
     setSettingsSnapshot(next)
-    setLastUpdated(new Date())
+    setInventory(previous => ({ ...previous, offers: reconfigureOffers(previous.offers, previous.items, previousConfig, next.config, new Date()), lastUpdated: new Date() }))
   }
 
   const confirmProduction = (quantities: Record<string, number>) => {
@@ -63,8 +105,10 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     persistSettings(next)
     snapshotRef.current = next
     setSettingsSnapshot(next)
-    setItems(previous => applyProduction(previous, nextProduction, DEMO_HISTORICAL_AVERAGES, today))
-    setLastUpdated(new Date())
+    setInventory(previous => {
+      const items = applyProduction(previous.items, nextProduction, DEMO_HISTORICAL_AVERAGES, today)
+      return { ...previous, items, offers: reconcileOffers(previous.offers, items, next.config, new Date()), lastUpdated: new Date() }
+    })
   }
 
   // A confirmação e os pedidos simulados pertencem ao dia do restaurante.
@@ -73,88 +117,26 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       const today = restaurantDate()
       if (today === productionDate) return
       setProductionDate(today)
-      setItems(previous => applyProduction(previous.map(item => ({ ...item, sold: 0, lastOrderAt: undefined })), snapshotRef.current.production, DEMO_HISTORICAL_AVERAGES, today))
-      setRecentOrders([])
-      setLastUpdated(new Date())
+      setInventory(previous => {
+        const items = applyProduction(previous.items.map(item => ({ ...item, sold: 0, lastOrderAt: undefined })), snapshotRef.current.production, DEMO_HISTORICAL_AVERAGES, today)
+        return { ...previous, items, offers: rebaseOffers(previous.offers, previous.items, items), recentOrders: [], lastUpdated: new Date() }
+      })
     }
     const timer = window.setInterval(checkDate, 15000)
     window.addEventListener('focus', checkDate)
     return () => { window.clearInterval(timer); window.removeEventListener('focus', checkDate) }
   }, [productionDate])
 
-  // Dispara um novo pedido em tempo real
-  const simulateIncomingOrder = useCallback((specificItemId?: string) => {
-    setItems((prevItems) => {
-      if (prevItems.length === 0) return prevItems
+  // Estoque e pedido são atualizados juntos; o updater permanece puro no StrictMode.
+  const placeOrder = useCallback((specificItemId?: string, offerOnly = false) => {
+    const timestamp = new Date()
+    const random = Math.random()
+    const orderId = `PED-${timestamp.getTime()}-${Math.floor(Math.random() * 10000)}`
+    setInventory(previous => placeInventoryOrder(previous, config, timestamp, random, orderId, specificItemId, offerOnly))
+  }, [config])
 
-      // Escolhe um item específico ou um item aleatório com estoque > 0
-      const availableItems = prevItems.filter((i) => i.currentStock > 0)
-      if (availableItems.length === 0) return prevItems
-
-      let targetItem = specificItemId
-        ? prevItems.find((i) => i.id === specificItemId)
-        : null
-
-      if (!targetItem || targetItem.currentStock <= 0) {
-        // Ponderar levemente para itens em risco para simular vendas naturais
-        const randomIndex = Math.floor(Math.random() * availableItems.length)
-        targetItem = availableItems[randomIndex]
-      }
-
-      const qtyBought = Math.min(targetItem.currentStock, Math.floor(Math.random() * 2) + 1)
-      const now = new Date()
-
-      // Registrar o pedido no histórico
-      const newOrder: StoreOrder = {
-        id: `PED-${Math.floor(1000 + Math.random() * 9000)}`,
-        timestamp: now,
-        items: [
-          {
-            itemId: targetItem.id,
-            itemName: targetItem.name,
-            quantity: qtyBought,
-            price: targetItem.unitPrice,
-          },
-        ],
-        total: qtyBought * targetItem.unitPrice,
-      }
-
-      setRecentOrders((prev) => [newOrder, ...prev.slice(0, 9)])
-      setLastUpdated(now)
-
-      // Atualiza o item e recalcula o risco
-      return prevItems.map((item) => {
-        if (item.id === targetItem!.id) {
-          const newSold = item.sold + qtyBought
-          // Conforme os pedidos entram perto do fechamento, a estimativa restante pode ajustar
-          const remainingTimeFactor = 0.95
-          const newEstimatedSales = Math.max(
-            0,
-            Math.round(item.estimatedSalesUntilClose * remainingTimeFactor)
-          )
-
-          const risk = calculateRisk(
-            item.prepared,
-            newSold,
-            newEstimatedSales,
-            item.unitPrice
-          )
-
-          return {
-            ...item,
-            sold: newSold,
-            currentStock: risk.currentStock,
-            estimatedSalesUntilClose: newEstimatedSales,
-            projectedSurplus: risk.projectedSurplus,
-            estimatedLossValue: risk.estimatedLossValue,
-            riskLevel: risk.riskLevel,
-            lastOrderAt: now,
-          }
-        }
-        return item
-      })
-    })
-  }, [])
+  const simulateIncomingOrder = useCallback((itemId?: string) => placeOrder(itemId), [placeOrder])
+  const purchaseFlashDeal = (itemId: string) => placeOrder(itemId, true)
 
   // Simulação periódica de novos pedidos caso o toggle esteja ativo
   useEffect(() => {
@@ -172,9 +154,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }
 
   const resetToDefault = () => {
-    setItems(applyProduction(getInitialItems(), production, DEMO_HISTORICAL_AVERAGES, productionDate))
-    setRecentOrders([])
-    setLastUpdated(new Date())
+    setInventory({ items: applyProduction(getInitialItems(), production, DEMO_HISTORICAL_AVERAGES, productionDate), recentOrders: [], lastUpdated: new Date(), offers: { cycle: '', paused: false, pausedItems: [], allocations: [] } })
   }
 
   const summary = useMemo(() => {
@@ -225,6 +205,13 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         simulateIncomingOrder,
         resetToDefault,
         summary,
+        flashDeals,
+        offerWindow,
+        offersPaused: offerBook.paused,
+        now,
+        toggleOffersPaused,
+        toggleOfferPaused,
+        purchaseFlashDeal,
       }}
     >
       {children}

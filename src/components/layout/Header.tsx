@@ -13,7 +13,7 @@ import {
 import { useStore } from '../../context/StoreContext'
 
 export const Header: React.FC = () => {
-  const { config, summary } = useStore()
+  const { config, summary, isLiveSimulationActive } = useStore()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const navItems = [
@@ -61,8 +61,8 @@ export const Header: React.FC = () => {
 
           <div className="flex items-center gap-2 shrink-0">
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-brand-amber/15 border border-brand-amber/35 text-brand-light text-[10px] sm:text-[11px] font-bold">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-amber animate-ping" />
-              Auto Pedidos ON
+              <span className={`w-1.5 h-1.5 rounded-full bg-brand-amber ${isLiveSimulationActive ? 'animate-ping' : ''}`} />
+              Auto Pedidos {isLiveSimulationActive ? 'ON' : 'OFF'}
             </span>
             <span className="text-purple-400/50 hidden sm:inline">•</span>
             <span className="text-purple-300/80 text-[11px] hidden sm:inline">
